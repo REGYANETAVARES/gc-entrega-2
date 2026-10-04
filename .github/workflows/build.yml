@@ -1,0 +1,43 @@
+name: Sistema de Construção
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: Compilar, testar, empacotar e gerar documentação
+        run: mvn -B test package javadoc:javadoc
+
+      - name: Publicar sistema executável
+        uses: actions/upload-artifact@v4
+        with:
+          name: sistema-executavel
+          path: target/sistema-construcao-1.0.0.jar
+
+      - name: Publicar relatórios de testes
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-testes
+          path: target/surefire-reports/
+
+      - name: Publicar documentação Javadoc
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentacao-javadoc
+          path: target/site/apidocs/
